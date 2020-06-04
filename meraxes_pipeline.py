@@ -46,48 +46,48 @@ lcdesiredfields = ["LightconeBox","lightcone-z"]
 # ################################################
 
 
-# #Make the directory for the meraxes data to be put
-# os.makedirs(meraxesoutputdir,exist_ok=True)
+#Make the directory for the meraxes data to be put
+os.makedirs(meraxesoutputdir,exist_ok=True)
 
-# #First run meraxes
-# returncode = run_meraxes(meraxesbasedir,meraxesoutputdir,random_seed,escape_fraction_norm)
+#First run meraxes
+returncode = run_meraxes(meraxesbasedir,meraxesoutputdir,random_seed,escape_fraction_norm)
 
-# #Check if meraxes completed successfully
-# if(returncode!=0):
-# 	raise SystemExit("Running meraxes failed")
+#Check if meraxes completed successfully
+if(returncode!=0):
+	raise SystemExit("Running meraxes failed")
 
-# #Write seed to file containing the list of random numbers
-# rseedname=meraxesbasedir + "output/rseed-EFN" + escape_fraction_norm +".txt"
-# if(os.path.exists(rseedname)):
-# 	mode = "a"
-# else:
-# 	mode = "w"
+#Write seed to file containing the list of random numbers
+rseedname=meraxesbasedir + "output/rseed-EFN" + escape_fraction_norm +".txt"
+if(os.path.exists(rseedname)):
+	mode = "a"
+else:
+	mode = "w"
 
-# randnfile = open(rseedname,mode)
-# randnfile.write(random_seed+"\n")
-# randnfile.close()
+randnfile = open(rseedname,mode)
+randnfile.write(random_seed+"\n")
+randnfile.close()
 
 
-# #################################################
-# ########### Reducing the meraxes data ###########
-# #################################################
+#################################################
+########### Reducing the meraxes data ###########
+#################################################
 
-# #Make the directory to put the reduced data
-# os.makedirs(reducedoutputdir,exist_ok=True)
+#Make the directory to put the reduced data
+os.makedirs(reducedoutputdir,exist_ok=True)
 
-# #Run the function to reduced the meraxes data for the desired snapshots
-# ReduceMeraxesData(startsnap,endsnap,meraxesoutputdir,reducedoutputdir,galdesiredfields,lcdesiredfields)
+#Run the function to reduced the meraxes data for the desired snapshots
+ReduceMeraxesData(startsnap,endsnap,meraxesoutputdir,reducedoutputdir,galdesiredfields,lcdesiredfields)
 
-# #Write seed to file containing the list of random numbers
-# rseedname ="/fred/oz009/bnasirud/reduced_meraxes_data/rseed-EFN" + escape_fraction_norm +".txt"
-# if(os.path.exists(rseedname)):
-# 	mode = "a"
-# else:
-# 	mode = "w"
+#Write seed to file containing the list of random numbers
+rseedname ="/fred/oz009/bnasirud/reduced_meraxes_data/rseed-EFN" + escape_fraction_norm +".txt"
+if(os.path.exists(rseedname)):
+	mode = "a"
+else:
+	mode = "w"
 
-# randnfile = open(rseedname,mode)
-# randnfile.write(random_seed+"\n")
-# randnfile.close()
+randnfile = open(rseedname,mode)
+randnfile.write(random_seed+"\n")
+randnfile.close()
 
 #################################################
 ############## Processing Pipeline ##############

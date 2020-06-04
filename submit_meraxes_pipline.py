@@ -27,8 +27,7 @@ submitfile.close()
 for i in range(nsubmit):
 
 	#Get a random number to set the Meraxes seed
-	# random_seed = np.random.randint(0,int(2**32-1))
-	random_seed = 1499405802
+	random_seed = np.random.randint(0,int(2**32-1))
 
 	meraxesoutputdir = basemeraxesoutputdir + "output-Genesis_L500_N2160-"+ str(random_seed) +"-EFN" + escape_fraction_norm + "/"
 	reducedoutputdir = basereducedoutputdir + str(random_seed) +"-EFN" + escape_fraction_norm + "/"
