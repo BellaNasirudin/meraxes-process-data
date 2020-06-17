@@ -65,5 +65,3 @@ for random_seed in rand_ints:
 		raise SystemExit("Submission failed")
 	else:
 		print("Submitted script",script,"for random seed",random_seed,"and EFN",escape_fraction_norm)
-
-	break
