@@ -7,6 +7,7 @@ import os
 escape_fraction_norm = sys.argv[1]
 
 rseedfname = "/fred/oz009/bnasirud/reduced_meraxes_data/rseed-EFN"+escape_fraction_norm+".txt"
+# rseedfname = "/fred/oz009/bnasirud/processing_pipeline/reproccess-rseed-EFN0.06.txt"
 
 rand_ints = np.loadtxt(rseedfname,dtype=int)
 script = "process_pipeline.py"
@@ -23,19 +24,20 @@ submitfile.close()
 
 for random_seed in rand_ints:
 
+	# random_seed = 4125055411 #986284303 #1176542000 #
 	#The output directory
-	outputdatadir = "/fred/oz009/bnasirud/data_processed/"+str(random_seed)+"-EFN" + escape_fraction_norm + "/data/" 
+	outputdatadir = "/fred/oz009/bnasirud/data_processed/"+str(random_seed)+"-EFN" + escape_fraction_norm + "/" 
 	# if(os.path.isdir(outputdatadir)):
 
-	if(os.path.exists(outputdatadir + "power_spectrum.npz")):
-		checkfile = np.load(outputdatadir + "power_spectrum.npz")
-		if("power_spectrum_both" in list(checkfile)):
-			print("power_spectrum_both already exists in",outputdatadir+ "power_spectrum.npz, skipping...")
-			continue
-		else:
-			print("power_spectrum_both does not exist in",outputdatadir+ "power_spectrum.npz, reprocessing")
-	else:
-		os.makedirs(outputdatadir,exist_ok=True)
+	# if(os.path.exists(outputdatadir + "power_spectrum.npz")):
+	# 	checkfile = np.load(outputdatadir + "power_spectrum.npz")
+	# 	if("power_spectrum_both" in list(checkfile)):
+	# 		print("power_spectrum_both already exists in",outputdatadir+ "power_spectrum.npz, skipping...")
+	# 		continue
+	# 	else:
+	# 		print("power_spectrum_both does not exist in",outputdatadir+ "power_spectrum.npz, reprocessing")
+	# else:
+	# 	os.makedirs(outputdatadir,exist_ok=True)
 
 	#Make the output directory with the name in the rseed
 	if(meraxesdataflag):
@@ -63,3 +65,5 @@ for random_seed in rand_ints:
 		raise SystemExit("Submission failed")
 	else:
 		print("Submitted script",script,"for random seed",random_seed,"and EFN",escape_fraction_norm)
+
+	break

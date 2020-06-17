@@ -48,6 +48,7 @@ def GenerateLightconeFG(isnap, inputdatadir, outputdatadir,redshift, totngalaxie
 	
 	if galdata["BlackHoleMass"].size>0:
 
+
 		total_flux = np.zeros(len(galdata["Pos"]))
 		all_BH_flux = np.zeros(len(galdata["Pos"]))
 		all_star_flux = np.zeros(len(galdata["Pos"]))
@@ -107,8 +108,13 @@ def GenerateLightconeFG(isnap, inputdatadir, outputdatadir,redshift, totngalaxie
 		# this gives the indices of galaxies that are within the lightcone slice
 		ind = indicesRandomization(position[:,direction], bins_pos, distance)
 
-		# saving the separate AGN and SF galaxies luminosity at 1.4 GHz
-		np.savez_compressed(outputdatadir+ "agn_sfg_luminosity1.4GHz_redshift_%.2f" %znow, agn = all_BH_flux[sel_total_flux][ind], sf_gal = all_star_flux[sel_total_flux][ind])
+		hdffile = h5py.File(outputdatadir+ "agn_sfg_luminosity1.4GHz_redshift_%.2f.hdf5" %znow,"w")
+
+		hdffile.create_dataset("agn",data=all_BH_flux[sel_total_flux][ind],compression="gzip",compression_opts=6)
+
+		hdffile.create_dataset("sf_gal",data= all_star_flux[sel_total_flux][ind],compression="gzip",compression_opts=6)
+
+		hdffile.close()
 
 		# scale fg to 150 MHz
 		flux_150, gamma = scaledFluxDensity(total_flux)
@@ -120,7 +126,17 @@ def GenerateLightconeFG(isnap, inputdatadir, outputdatadir,redshift, totngalaxie
 		sel_flux_150 = (flux_150[ind]<=max_Jy) & (flux_150[ind]>=min_Jy)
 		flux_150 = flux_150[ind][sel_flux_150]
 		gamma = gamma[ind][sel_flux_150]
-		
+
+		# hdffile = h5py.File(outputdatadir+ "fluxLightconePosition_150MHz_redshift_%.2f.hdf5" %znow,"w")
+
+		# hdffile.create_dataset("flux",data=flux_150,compression="gzip",compression_opts=6)
+
+		# hdffile.create_dataset("xpos",data= xpos,compression="gzip",compression_opts=6)
+
+		# hdffile.create_dataset("ypos",data= ypos,compression="gzip",compression_opts=6)
+
+		# hdffile.close()
+
 		for kk in range(len(frequency_lc)):
 			lightcone_fg[:,:, kk] += np.histogram2d(xpos, ypos, bins= np.array([bins_pos,bins_pos]), weights = scaledFluxDensity(flux_150, gamma=gamma, frequency=frequency_lc[kk]))[0]
 		
@@ -141,7 +157,7 @@ def ConstructLightconeFG(startsnap,endsnap,inputdatadir,redshift, totngalaxies, 
 	lightcone_fg = np.zeros((Ngrid,Ngrid,len(frequency_lc))) # set it to be big over z direction
 
 	#Find out how many chunks need to process the data in
-	ncpus = min(mp.cpu_count(), numsnaps)
+	ncpus = int(os.getenv("SLURM_NTASKS",mp.cpu_count()))
 	nchunks = int(np.ceil(numsnaps/float(ncpus)))
 
 	#Setup the buffers to store the data
@@ -224,13 +240,13 @@ def GeneratePowerSpectrum(lightcone_fg,redshift_lc,frequency_lc,lc_slice_sel,Ngr
 	highres_lightcone_eor = f_lc_eor(np.array([xx.flatten(), yy.flatten(), zz.flatten()]).T).reshape(Ngrid,Ngrid,len(new_coords_z))
 
 	# Find the PS of foregrounds plus eor
-	P_both, kperp, kparal = get_power((highres_lightcone_fg + highres_lightcone_eor) * signal.blackmanharris(len(new_coords_z)), [500, 500, Lz_Mpc], bins = 50, res_ndim =2, bin_ave=False, get_variance=False)
+	P_both, kperp, kparal = get_power((highres_lightcone_fg + highres_lightcone_eor) * signal.blackmanharris(len(new_coords_z)), [500/cosmo.h, 500/cosmo.h, Lz_Mpc/cosmo.h], bins = 50, res_ndim =2, bin_ave=False, get_variance=False)
 
 	# Find the PS of foregrounds only
-	P_fg = get_power(highres_lightcone_fg * signal.blackmanharris(len(new_coords_z)), [500, 500, Lz_Mpc], bins = 50, res_ndim =2, bin_ave=False, get_variance=False)[0]
+	P_fg = get_power(highres_lightcone_fg * signal.blackmanharris(len(new_coords_z)), [500/cosmo.h, 500/cosmo.h, Lz_Mpc/cosmo.h], bins = 50, res_ndim =2, bin_ave=False, get_variance=False)[0]
 
 	# Find the PS of eor only
-	P_eor = get_power(highres_lightcone_eor * signal.blackmanharris(len(new_coords_z)), [500, 500, Lz_Mpc], bins = 50, res_ndim =2, bin_ave=False, get_variance=False)[0]
+	P_eor = get_power(highres_lightcone_eor * signal.blackmanharris(len(new_coords_z)), [500/cosmo.h, 500/cosmo.h, Lz_Mpc/cosmo.h], bins = 50, res_ndim =2, bin_ave=False, get_variance=False)[0]
 
 	#Save the power spectrum
 	np.savez_compressed(outputdatadir + "power_spectrum.npz", power_spectrum_both = P_both, power_spectrum_eor = P_eor, power_spectrum_fg = P_fg, kperp = kperp, kparal = kparal)

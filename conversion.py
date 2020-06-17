@@ -101,7 +101,7 @@ def frequencytoRedshift(frequency):
 	
 	return redshift
 
-def scaledFluxDensity(fluxDensity, frequency=1.4e9, gamma= None, redshift = None, frequency0 = 150e6, mu=0.8, sigma=0.05):
+def scaledFluxDensity(fluxDensity, frequency=150e6, gamma= None, redshift = None, frequency0 = 1.4e9, mu=0.8, sigma=0.05):
 
 	if redshift != None:
 		frequency0 = frequencyRedshift(redshift)
